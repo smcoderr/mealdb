@@ -17,58 +17,54 @@ const Main = () => {
       const API_URL = "https://www.themealdb.com/api/json/v1/1/categories.php";
       const response = await fetch(API_URL);
       const categorydata = await response.json();
-      console.log(categorydata); // Log response for debugging
       setCatlist(categorydata.categories);
     } catch (error) {
       console.error("Failed to fetch categories:", error);
     }
   };
-  
+
   const singleDishDB = async () => {
     try {
       const API_URL = "https://www.themealdb.com/api/json/v1/1/search.php?f=c";
       const response = await fetch(API_URL);
       const SingleDishData = await response.json();
-      console.log(SingleDishData); // Log response for debugging
       setBeefCategory(SingleDishData.meals);
     } catch (error) {
       console.error("Failed to fetch dishes:", error);
     }
   };
-  
 
   useEffect(() => {
     categoryDB();
     singleDishDB();
   }, []);
+
   return (
-    <>
-      <Router>
-        <Header />
-        <main>
-          <AppProvider>
-            <Routes>
-              <Route
-                exact
-                path="/"
-                element={
-                  <AllMenus>
-                    <SpecialMenu />
-                    <FilteredDishes
-                      catlist={catlist}
-                      beefCategory={beefCategory}
-                      setBeefCategory={setBeefCategory}
-                    />
-                  </AllMenus>
-                }
-              />
-              <Route path="/checkout" element={<Checkout />} />
-            </Routes>
-          </AppProvider>
-        </main>
-        <Footer />
-      </Router>
-    </>
+    <Router basename="/mealdb">
+      <Header />
+      <main>
+        <AppProvider>
+          <Routes>
+            <Route
+              exact
+              path="/"
+              element={
+                <AllMenus>
+                  <SpecialMenu />
+                  <FilteredDishes
+                    catlist={catlist}
+                    beefCategory={beefCategory}
+                    setBeefCategory={setBeefCategory}
+                  />
+                </AllMenus>
+              }
+            />
+            <Route path="/checkout" element={<Checkout />} />
+          </Routes>
+        </AppProvider>
+      </main>
+      <Footer />
+    </Router>
   );
 };
 
