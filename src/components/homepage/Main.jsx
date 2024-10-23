@@ -40,7 +40,7 @@ const Main = () => {
   }, []);
 
   return (
-    <Router>
+    <Router basename="/mealdb">
       <Header />
       <main>
         <AppProvider>
