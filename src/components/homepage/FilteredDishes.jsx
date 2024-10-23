@@ -5,73 +5,62 @@ import Popup from "./Popup";
 import { AllMenuContext } from "./AllMenuContext";
 
 function FilteredDishes({ catlist, beefCategory, setBeefCategory }) {
-  let [filteredDishesListAre, setFilteredDishesListAre] = useState([]);
-  let [activeDish, setActiveDish] = useState("Beef");
-  let [currentPage, setCurrentPage] = useState(1);
-  let [itemsPerPage, setItemsPerPage] = useState(4);
-  let [showPopup, setShowPopup] = useState(false);
-  let [currentDish, setCurrentDish] = useState("");
+  const [filteredDishesListAre, setFilteredDishesListAre] = useState([]);
+  const [activeDish, setActiveDish] = useState("Beef");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(4);
+  const [showPopup, setShowPopup] = useState(false);
+  const [currentDish, setCurrentDish] = useState("");
 
   const allMenus = useContext(AllMenuContext);
 
-  let indexOfLastDish = currentPage * itemsPerPage;
+  // Calculate pagination
+  const indexOfLastDish = currentPage * itemsPerPage;
+  const indexOfFirstDish = indexOfLastDish - itemsPerPage;
+  const showFilteredDishes = filteredDishesListAre.slice(indexOfFirstDish, indexOfLastDish);
 
-  let indexOfFirstDish = indexOfLastDish - itemsPerPage;
-
-  let showFilteredDishes = filteredDishesListAre.slice(
-    indexOfFirstDish,
-    indexOfLastDish
-  );
-
+  // Handle popup display
   function popupHandler(itemName) {
     setShowPopup(true);
     setCurrentDish(itemName);
   }
 
+  // Handle filtering of dishes based on category selection
   function filtringHandler(e) {
-    setCurrentPage(1);
-    setBeefCategory([]);
-    setActiveDish(e);
+    setCurrentPage(1); // Reset to first page
+    setActiveDish(e); // Update active dish category
     const filteredDishesList = allMenus
-      .filter((item) => {
-        return item.strCategory === e;
-      })
-      .map((item, index) => {
-        return (
-          <CardData item={item} index={index} popupHandler={popupHandler} />
-        );
-      });
+      .filter((item) => item.strCategory === e)
+      .map((item, index) => <CardData item={item} index={index} popupHandler={popupHandler} />);
     setFilteredDishesListAre(filteredDishesList);
   }
-  const categoryList = catlist.map((item, index) => {
-    return (
-      <li
-        key={index}
-        className={item.strCategory === activeDish ? "active" : ""}
-        onClick={() => {
-          filtringHandler(item.strCategory);
-        }}
-      >
-        {item.strCategory}
-      </li>
-    );
-  });
 
+  // Render category list
+  const categoryList = catlist.map((item, index) => (
+    <li
+      key={index}
+      className={item.strCategory === activeDish ? "active" : ""}
+      onClick={() => filtringHandler(item.strCategory)}
+    >
+      {item.strCategory}
+    </li>
+  ));
+
+  // Render dishes for the initial load (Beef category)
   const firstLoadAre = beefCategory
-    .filter((item) => {
-      return item.strCategory === "Beef";
-    })
-    .map((item, index) => {
-      return <CardData item={item} index={index} popupHandler={popupHandler} />;
-    });
-  let showFirstLoadAre = firstLoadAre.slice(indexOfFirstDish, indexOfLastDish);
+    .filter((item) => item.strCategory === "Beef")
+    .map((item, index) => <CardData item={item} index={index} popupHandler={popupHandler} />);
+  
+  const showFirstLoadAre = firstLoadAre.slice(indexOfFirstDish, indexOfLastDish);
 
+  // Handle closing the popup
   function closePopupHandler() {
     setShowPopup(false);
   }
 
-  function aadToCartHandler(e) {
-    alert(e);
+  // Handle adding to cart (placeholder function)
+  function addToCartHandler(e) {
+    alert(`Added to cart: ${e}`);
   }
 
   return (
@@ -80,15 +69,13 @@ function FilteredDishes({ catlist, beefCategory, setBeefCategory }) {
         <Popup
           closePopupHandler={closePopupHandler}
           currentDish={currentDish}
-          aadToCartHandler={aadToCartHandler}
+          addToCartHandler={addToCartHandler}
         />
       )}
       <ul className="categoryList">{categoryList}</ul>
       <ul className="filtered-dishes-list">
-        {showFirstLoadAre}
-        {firstLoadAre.length > 0 || showFilteredDishes.length > 0
-          ? showFilteredDishes
-          : "its empty"}
+        {showFirstLoadAre.length > 0 ? showFirstLoadAre : "No dishes available"}
+        {showFilteredDishes.length > 0 ? showFilteredDishes : null}
       </ul>
 
       <Pagenation
